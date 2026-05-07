@@ -9,13 +9,11 @@ import {
 } from 'react-icons/fa';
 import { CITY_OPTIONS } from '../constants';
 import { t } from '../../../i18n';
+import { formatSubcategoryName } from '../../../utils/helperFunctions';
 
 
 const formatCategoryName = (category: string): string =>
-  category
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+  formatSubcategoryName(category);
 
 const normalizeValue = (value: string): string => value.trim().replace(/\s+/g, ' ');
 

@@ -2,6 +2,11 @@ import { t } from '../i18n';
 
 export function formatSubcategoryName(name: string | undefined | null): string {
   if (!name) return '';
+  if (name.includes('_')) {
+    const backendCategoryTranslated = t(`backend.categories.${name}`);
+    if (backendCategoryTranslated !== `backend.categories.${name}`) return backendCategoryTranslated;
+  }
+
   const translated = t(name);
   if (translated !== name) return translated;
 

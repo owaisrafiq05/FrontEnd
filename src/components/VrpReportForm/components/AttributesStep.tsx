@@ -5,6 +5,7 @@ import {
 import { useEffect, useState } from "react";
 import { CustomReportData } from "../../../types";
 import { t } from '../../../i18n';
+import { formatSubcategoryName } from "../../../utils/helperFunctions";
 
 
 interface CategoryItem {
@@ -288,7 +289,7 @@ const SetAttributeStep = ({
                         : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary hover:text-primary"
                   } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
-                  {item.value}
+                  {item.type === "predefined" ? formatSubcategoryName(item.value) : item.value}
                 </span>
               );
             })}
