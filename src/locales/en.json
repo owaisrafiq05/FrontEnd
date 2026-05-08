@@ -1024,6 +1024,7 @@
   "intelligence-population-overview": "Intelligence on population trends and demographics.",
   "intelligence-income-overview": "Intelligence on income levels and economic status.",
   "intelligence-real-estate-overview": "Intelligence on housing market and availability.",
+  "please-select-country-and-city-to-add-items-to-cart.": "Please select country and city to add items to cart.",
   "dataset-real-estate-overview": "Real estate listings and categories covering properties for sale or rent. Each record represents a single listing or property entry.",
   "dataset-google-categories-overview": "Places and POI categories derived from Places taxonomy. Records represent individual places with associated types and popularity metrics.",
   "new-purchase-of": "New purchase of {{item}}",

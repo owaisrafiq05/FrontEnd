@@ -207,8 +207,8 @@ function CheckoutBilling({ Name }: { Name: string }) {
   const hasCountryAndCity = !!(checkout.country_name?.trim() && checkout.city_name?.trim());
   const addToCartDisabled = !hasCountryAndCity;
   const addToCartMessage = !hasCountryAndCity
-    ? 'Please select country and city to add items to cart.'
-    : undefined;
+    ? t("please-select-country-and-city-to-add-items-to-cart.")
+    : '';
 
   // Update active view when Name changes
   useEffect(() => {
