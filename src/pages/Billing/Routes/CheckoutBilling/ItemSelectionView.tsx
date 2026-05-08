@@ -91,14 +91,18 @@ function ItemSelectionView({
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500 bg-gray-100 rounded-full">
-            {selectedItem.type}
+            {t(selectedItem.type === 'report' ? 'report-2' : selectedItem.type)}
           </span>
           {selectedItem.isCurrentlyOwned && (
             <span className="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wide text-green-700 bg-green-100 rounded-full">{t("owned")}</span>
           )}
         </div>
         {selectedItem.explanation && (
-          <p className="mt-2 text-sm text-gray-600 italic">{selectedItem.explanation}</p>
+          <p className="mt-2 text-sm text-gray-600 italic">
+            {selectedItem.explanation.startsWith("New purchase of") 
+              ? t("new-purchase-of", { item: selectedItem.name })
+              : selectedItem.explanation}
+          </p>
         )}
         {selectedItem.expiration && (
           <p className="mt-1 text-xs text-gray-500">{t("expires")}{' '}{new Date(selectedItem.expiration).toLocaleDateString()}

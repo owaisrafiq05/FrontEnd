@@ -960,10 +960,9 @@ function CheckoutBilling({ Name }: { Name: string }) {
         // by the backend – look them up from the frontend's local metaDataInformation.json
         const localMeta = type !== 'report' ? getLocalMetadata(type, key, item) : null;
         const resolvedDescription =
-          item.description ||
           (type === 'report'
             ? t(`report-package-${key}-description`)
-            : localMeta?.description || '');
+            : localMeta?.description) || item.description || '';
         const resolvedDataVariables =
           item.data_variables
             ? convertDataVariables(item.data_variables)
@@ -1224,12 +1223,12 @@ function CheckoutBilling({ Name }: { Name: string }) {
                 role="button"
                 tabIndex={0}
                 onClick={() => {
-                  handleItemSelect('Population', 'intelligence', 'Population Intelligence');
+                  handleItemSelect('Population', 'intelligence', t("population-intelligence"));
                 }}
                 onKeyDown={event => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    handleItemSelect('Population', 'intelligence', 'Population Intelligence');
+                    handleItemSelect('Population', 'intelligence', t("population-intelligence"));
                   }
                 }}
               >
@@ -1323,12 +1322,12 @@ function CheckoutBilling({ Name }: { Name: string }) {
                 role="button"
                 tabIndex={0}
                 onClick={() => {
-                  handleItemSelect('Income', 'intelligence', 'Income Intelligence');
+                  handleItemSelect('Income', 'intelligence', t("income-intelligence"));
                 }}
                 onKeyDown={event => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    handleItemSelect('Income', 'intelligence', 'Income Intelligence');
+                    handleItemSelect('Income', 'intelligence', t("income-intelligence"));
                   }
                 }}
               >
@@ -1369,12 +1368,12 @@ function CheckoutBilling({ Name }: { Name: string }) {
                 role="button"
                 tabIndex={0}
                 onClick={() => {
-                  handleItemSelect('Real Estate', 'intelligence', 'Real Estate Intelligence');
+                  handleItemSelect('Real Estate', 'intelligence', t("real-estate-intelligence"));
                 }}
                 onKeyDown={event => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    handleItemSelect('Real Estate', 'intelligence', 'Real Estate Intelligence');
+                    handleItemSelect('Real Estate', 'intelligence', t("real-estate-intelligence"));
                   }
                 }}
               >
