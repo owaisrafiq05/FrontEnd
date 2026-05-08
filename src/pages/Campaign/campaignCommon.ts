@@ -6,7 +6,9 @@ import { t } from '../../i18n';
 export type Report = {
   id: number;
   title: string;
+  titleKey?: string;
   description: string;
+  descriptionKey?: string;
   icon?: string;
   bgImage?: string | null;
   options: {

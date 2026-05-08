@@ -116,8 +116,8 @@ export default function CampaignPage() {
                     {reports.map((report, index) => (
                       <SelectableCard
                         key={report.id}
-                        title={report.title}
-                        description={report.description}
+                        title={report.titleKey ? t(report.titleKey) : report.title}
+                        description={report.descriptionKey ? t(report.descriptionKey) : report.description}
                         onClick={() => handleReportClick(report)}
                         icon={<FaMapMarkedAlt className="w-6 h-6" />}
                         badge={index === 0 ? t("popular") : undefined}

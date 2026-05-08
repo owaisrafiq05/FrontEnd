@@ -164,8 +164,8 @@ export default function CampaignHomePage() {
                 {reports.map((report, index) => (
                   <SelectableCard
                     key={report.id}
-                    title={report.title}
-                    description={report.description}
+                    title={report.titleKey ? t(report.titleKey) : report.title}
+                    description={report.descriptionKey ? t(report.descriptionKey) : report.description}
                     onClick={() => handleReportClick(report)}
                     icon={<DynamicIcon iconString={report.icon} fallbackIcon={FaMapMarkedAlt} className="w-6 h-6" />}
                     badge={index === 0 && !report.coming_soon ? t("popular") : undefined}
