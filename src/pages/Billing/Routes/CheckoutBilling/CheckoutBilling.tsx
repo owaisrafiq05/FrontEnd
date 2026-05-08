@@ -266,17 +266,24 @@ function CheckoutBilling({ Name }: { Name: string }) {
 
       // Derive perks from tier key (no longer parsed from description)
       const getTierPerks = (reportTier: string, hasConcierge: boolean, pkg: ReportPackage): string[] => {
-        if (pkg.perks && pkg.perks.length > 0) return pkg.perks;
+        if (pkg.perks && pkg.perks.length > 0) {
+          return pkg.perks.map(perk => {
+            const key = perk.toLowerCase().replace(/\s+/g, '-');
+            const translated = t(key);
+            // If the key is not found (t returns the key itself), use the original perk
+            return translated !== key ? translated : perk;
+          });
+        }
         const perks: string[] = [];
         if (reportTier === 'basic') {
-          perks.push('Preset Scoring', '1x Report', 'Full Data Access');
+          perks.push(t('preset-scoring'), t('1x-report'), t('full-data-access'));
         } else {
-          perks.push('Custom Scoring', 'Full Data Access');
+          perks.push(t('custom-scoring'), t('full-data-access'));
         }
         if (pkg.included_report_refreshes) {
-          perks.push(`${pkg.included_report_refreshes}x Report Refreshes`);
+          perks.push(t('x-report-refreshes', { count: pkg.included_report_refreshes }));
         }
-        if (hasConcierge) perks.push('Personal Concierge Service');
+        if (hasConcierge) perks.push(t('personal-concierge-service'));
         return perks;
       };
 
@@ -308,7 +315,7 @@ function CheckoutBilling({ Name }: { Name: string }) {
           perks: getTierPerks(pkg.report_tier, hasConcierge, pkg),
           intelligences,
           isMostPopular: pkg.is_most_popular ?? (pkg.report_tier === 'premium'),
-          conciergeService: pkg.concierge_service || (hasConcierge ? 'Personal consultant to guide your business expansion' : undefined),
+          conciergeService: pkg.concierge_service || (hasConcierge ? t('personal-consultant') : undefined),
           datasetLimit: pkg.dataset_limit || pkg.included_datasets_count,
           additionalDatasetCost: pkg.additional_dataset_cost ?? 300,
           tag: pkg.tag,
@@ -1040,6 +1047,13 @@ function CheckoutBilling({ Name }: { Name: string }) {
 
   // Format category name for display
   const formatCategoryName = useCallback((category: string): string => {
+    const translationKey = `backend.categories.${category}`;
+    const translated = t(translationKey);
+    // If translation is found (t returns something other than the key itself), return it
+    if (translated && translated !== translationKey) {
+      return translated;
+    }
+    // Fallback if not translated
     return category
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
