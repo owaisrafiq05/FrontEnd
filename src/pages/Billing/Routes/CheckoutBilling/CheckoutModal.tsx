@@ -7,7 +7,7 @@ import { useUIContext } from '../../../../context/UIContext';
 import { useAuth, isGuestUser } from '../../../../context/AuthContext';
 import apiRequest from '../../../../services/apiRequest';
 import urls from '../../../../urls.json';
-import { t } from '../../../../i18n';
+import i18n, { t } from '../../../../i18n';
 
 
 const PurchaseSuccessModal = lazy(() => import('./PurchaseSuccessModal'));
@@ -326,7 +326,7 @@ function CheckoutModal({
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">{t("checkout")}</h2>
             <span className="text-sm text-gray-500">
-              {totalItems}{' '}{t("item")}{totalItems === 1 ? '' :t("s")}
+              {totalItems}{' '}{t("item")}{totalItems === 1 || i18n.language === 'ar' ? '' : t("s")}
             </span>
           </div>
           <button
@@ -396,12 +396,18 @@ function CheckoutModal({
                             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t("area")}</span>
                             <span className="text-sm text-gray-300">•</span>
                             <span className="text-sm text-gray-500">
-                              {item.intelligence_name ||"Unknown"}
+                              {formatSubcategoryName(item.intelligence_name)}
                             </span>
                           </div>
                           <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            {item.intelligence_name ||"Unknown"}{' '}{t("intelligence")}</h3>
-                          <p className="text-sm text-gray-500">{item.explanation}</p>
+                            {formatSubcategoryName(item.intelligence_name)}{' '}{t("intelligence")}</h3>
+                          <p className="text-sm text-gray-500">
+                            {item.explanation.startsWith("New purchase of")
+                              ? t("new-purchase-of", { item: formatSubcategoryName(item.intelligence_name) })
+                              : item.explanation.startsWith("Dataset '") && item.explanation.endsWith("' purchased")
+                              ? t("dataset-purchased", { item: formatSubcategoryName(item.intelligence_name) })
+                              : item.explanation}
+                          </p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           {item.free_as_part_of_package ? (
@@ -440,7 +446,13 @@ function CheckoutModal({
                           <h3 className="text-lg font-semibold text-gray-900 mb-1">
                             {formatSubcategoryName(item.dataset_name || '')}
                           </h3>
-                          <p className="text-sm text-gray-500">{item.explanation}</p>
+                          <p className="text-sm text-gray-500">
+                            {item.explanation.startsWith("New purchase of")
+                              ? t("new-purchase-of", { item: formatSubcategoryName(item.dataset_name) })
+                              : item.explanation.startsWith("Dataset '") && item.explanation.endsWith("' purchased")
+                              ? t("dataset-purchased", { item: formatSubcategoryName(item.dataset_name) })
+                              : item.explanation}
+                          </p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           {item.free_as_part_of_package ? (
@@ -478,7 +490,13 @@ function CheckoutModal({
                           </div>
                           <h3 className="text-lg font-semibold text-gray-900 mb-1">
                             {tierName}{' '}{t("report-2")}</h3>
-                          <p className="text-sm text-gray-500">{item.explanation}</p>
+                          <p className="text-sm text-gray-500">
+                            {item.explanation.startsWith("New purchase of")
+                              ? t("new-purchase-of", { item: tierName })
+                              : item.explanation.startsWith("Dataset '") && item.explanation.endsWith("' purchased")
+                              ? t("dataset-purchased", { item: tierName })
+                              : item.explanation}
+                          </p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <span className="text-lg font-semibold text-gray-900">

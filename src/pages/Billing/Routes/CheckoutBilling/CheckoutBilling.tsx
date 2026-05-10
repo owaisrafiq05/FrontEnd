@@ -11,7 +11,7 @@ import CheckoutModal from './CheckoutModal';
 import CategoriesBrowserSubCategories from '../../../../components/CategoriesBrowserSubCategories/CategoriesBrowserSubCategories';
 import { Skeleton } from '../../../../components/common/Skeleton';
 import { toast } from 'sonner';
-import { t } from '../../../../i18n';
+import i18next, { t } from '../../../../i18n';
 import metaDataInformation from '../../../../data/metaDataInformation.json';
 
 
@@ -204,6 +204,18 @@ function CheckoutBilling({ Name }: { Name: string }) {
   const { authResponse } = useAuth();
   const { checkout, dispatch } = useBillingContext();
 
+  const [currentLanguage, setCurrentLanguage] = React.useState(i18next.language);
+
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      setCurrentLanguage(i18next.language);
+    };
+    i18next.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18next.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
+
   const hasCountryAndCity = !!(checkout.country_name?.trim() && checkout.city_name?.trim());
   const addToCartDisabled = !hasCountryAndCity;
   const addToCartMessage = !hasCountryAndCity
@@ -221,7 +233,6 @@ function CheckoutBilling({ Name }: { Name: string }) {
     }
   }, [Name]);
 
-  // Fetch report packages from API
   const fetchReportPackages = useCallback(async () => {
     setIsLoadingReportTiers(true);
     try {
@@ -894,8 +905,10 @@ function CheckoutBilling({ Name }: { Name: string }) {
         }
       } else if (type === 'dataset') {
         const dataType = (item as (PurchaseItem & { data_type?: string }) | undefined)?.data_type as keyof typeof metaDataInformation.datasets | undefined;
-        if (dataType && metaDataInformation.datasets[dataType]) {
-          const meta = metaDataInformation.datasets[dataType];
+        // Fallback to google_categories if data_type is missing and key is not real_estate
+        const resolvedDataType = dataType || (key !== 'real_estate' ? 'google_categories' : undefined);
+        if (resolvedDataType && metaDataInformation.datasets[resolvedDataType]) {
+          const meta = metaDataInformation.datasets[resolvedDataType];
           return {
             description: t(meta.description_key),
             dataVariables: Object.entries(meta.data_variables_description_keys).map(([k, tk]) => ({
@@ -917,13 +930,16 @@ function CheckoutBilling({ Name }: { Name: string }) {
       type: 'dataset' | 'intelligence' | 'report',
       itemKey: string,
       description = t("no-data-available")
-    ): SelectedItemData => ({
-      name,
-      type,
-      description,
-      dataVariables: [],
-      itemKey,
-    }),
+    ): SelectedItemData => {
+      const translatedName = type === 'dataset' ? t(`backend.categories.${itemKey}`, { defaultValue: name }) : type === 'intelligence' ? t(`${itemKey.toLowerCase().replace(' ', '-')}-intelligence`, { defaultValue: name }) : name;
+      return {
+        name: translatedName,
+        type,
+        description,
+        dataVariables: [],
+        itemKey,
+      };
+    },
     []
   );
 
@@ -977,8 +993,10 @@ function CheckoutBilling({ Name }: { Name: string }) {
             ? []
             : localMeta?.dataVariables || [];
 
+        const translatedName = type === 'dataset' ? t(`backend.categories.${key}`, { defaultValue: name }) : type === 'intelligence' ? t(`${key.toLowerCase().replace(' ', '-')}-intelligence`, { defaultValue: name }) : name;
+        
         setSelectedItem({
-          name,
+          name: translatedName,
           type,
           description: resolvedDescription,
           dataVariables: resolvedDataVariables,
@@ -1010,6 +1028,7 @@ function CheckoutBilling({ Name }: { Name: string }) {
     createEmptySelectedItem,
     getReportSelectedItemFromTier,
     getLocalMetadata,
+    currentLanguage
   ]);
 
   // Handler to select item for viewing details (NOT for adding to cart)
