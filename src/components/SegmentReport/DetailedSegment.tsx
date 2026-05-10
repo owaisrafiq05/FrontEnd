@@ -2,7 +2,7 @@ import React from 'react';
 import { FaFile } from 'react-icons/fa';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { CustomSegment } from '../../types';
-import { t } from '../../i18n';
+import i18next, { t } from '../../i18n';
 
 
 interface DetailedSegmentProps {
@@ -77,10 +77,12 @@ function DetailedSegment({
                 .padStart(2, '0')}
             </div>
             <h2 className="text-2xl font-bold text-[#582c83]">
-              {selectedSegment.name}
+              {i18next.language === 'ar' ? selectedSegment.name_ar || selectedSegment.name : selectedSegment.name}
             </h2>
           </div>
-          <p className="text-gray-700 text-sm leading-relaxed">{selectedSegment.description}</p>
+          <p className="text-gray-700 text-sm leading-relaxed">
+            {i18next.language === 'ar' ? selectedSegment.description_ar || selectedSegment.description : selectedSegment.description}
+          </p>
         </div>
 
         {/* Right Section - Tabs and Content (2/3 of space) */}
@@ -140,18 +142,19 @@ function DetailedSegment({
                 {/* Description Section */}
                 <div className="bg-gray-50 rounded-lg p-6">
                   <p className="leading-relaxed text-gray-700">
-                    {selectedSegment.description}{t("this-group-typically-falls-within-the")}{' '}
+                    {i18next.language === 'ar' ? selectedSegment.description_ar || selectedSegment.description : selectedSegment.description}
+                    {' '}{t("this-group-typically-falls-within-the")}{' '}
                     <span className="font-semibold text-gray-900">
                       {selectedSegment.demographic_profile.age_range}
                     </span>{' '}{t("age-range-with-a-household-size-of")}{' '}
                     <span className="font-semibold text-gray-900">
                       {selectedSegment.demographic_profile.household_size}
-                    </span>{t("their-lifestyle-is-described-as")}{' '}
+                    </span>{' '}{t("their-lifestyle-is-described-as")}{' '}
                     <span className="font-semibold text-gray-900">
-                      {selectedSegment.demographic_profile.lifestyle}
+                      {t(selectedSegment.demographic_profile.lifestyle)}
                     </span>{t("and-they-tend-to-spend-on")}{' '}
                     <span className="font-semibold text-gray-900">
-                      {selectedSegment.demographic_profile.spending_habits}
+                      {t(selectedSegment.demographic_profile.spending_habits)}
                     </span>
                     .
                   </p>
@@ -163,7 +166,7 @@ function DetailedSegment({
                   <div className="bg-gradient-to-br from-white to-purple-50 border border-purple-100 rounded-lg p-4">
                     <div className="text-[#582c83] text-xs font-semibold mb-2 tracking-wide uppercase">{t("average-income")}</div>
                     <div className="text-gray-900 font-bold text-lg capitalize">
-                      {selectedSegment.demographic_profile.income}
+                      {t(selectedSegment.demographic_profile.income)}
                     </div>
                   </div>
 
@@ -197,7 +200,7 @@ function DetailedSegment({
                       >
                         <div className="relative">
                           <div className="text-[#582c83] text-xs font-bold mb-3 tracking-wider uppercase">
-                            {key.replace(/_/g, ' ')}
+                            {t(key)}
                           </div>
                           <div className="flex items-baseline gap-2">
                             <div className="text-4xl font-bold text-gray-900 group-hover:text-[#582c83] transition-colors">
@@ -257,7 +260,7 @@ function DetailedSegment({
                                 key={index}
                                 className="px-4 py-2 bg-white border border-blue-200 text-blue-700 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
                               >
-                                {category}
+                                {t(category)}
                               </span>
                             )
                           )}
@@ -295,7 +298,7 @@ function DetailedSegment({
                                 key={index}
                                 className="px-4 py-2 bg-white border border-green-200 text-green-700 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
                               >
-                                {category}
+                                {t(category)}
                               </span>
                             )
                           )}

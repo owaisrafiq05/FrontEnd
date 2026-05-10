@@ -158,7 +158,7 @@ const BasicInformationStep = ({
           <input
             type="text"
             id="country_name"
-            value={formData.country_name}
+            value={t(formData.country_name)}
             readOnly
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed"
           />
@@ -186,7 +186,7 @@ const BasicInformationStep = ({
           >
             {CITY_OPTIONS.map(city => (
               <option key={city} value={city}>
-                {city}
+                {t(city)}
               </option>
             ))}
           </select>

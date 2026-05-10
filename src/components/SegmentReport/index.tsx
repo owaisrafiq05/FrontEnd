@@ -1,3 +1,4 @@
+import i18next from '../../i18n';
 import { CustomSegment, CustomSegmentReportResponse } from '../../types';
 import ScrollableSegments from './ScrollableSegments';
 import DetailedSegment from './DetailedSegment';
@@ -18,7 +19,7 @@ function SmartSegmentReport({
 }: SmartSegmentReportProps) {
   const lite_segments =
     (Array.isArray(segmentReportData) ? segmentReportData : [])?.map(segment => ({
-      name: segment.name,
+      name: i18next.language === 'ar' ? segment.name_ar || segment.name : segment.name,
       icon: segment.icon,
       id: segment.segment_id,
     })) || [];
