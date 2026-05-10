@@ -22,7 +22,6 @@ import { useOTP } from '../../../../context/OTPContext';
 import { toast } from 'sonner';
 import { t } from '../../../../i18n';
 
-
 const ProfileMain: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile>({
     user_id: '',
@@ -83,6 +82,11 @@ const ProfileMain: React.FC = () => {
   };
   // Helper to format field labels nicely
   const formatLabel = (key: string): string => {
+    const slug = key.toLowerCase().replace(/_/g, '-');
+    // We check if the translation exists by comparing it with the key
+    const translated = t(slug);
+    if (translated !== slug) return translated;
+
     return key
       .replace(/_/g, ' ')
       .replace(/\b\w/g, l => l.toUpperCase())
@@ -108,11 +112,11 @@ const ProfileMain: React.FC = () => {
 
       let relative = '';
       if (diffDays > 0) {
-        relative = `${diffDays} days from now`;
+        relative = t("days-from-now", { count: diffDays });
       } else if (diffDays < 0) {
-        relative = `${Math.abs(diffDays)} days ago`;
+        relative = t("days-ago", { count: Math.abs(diffDays) });
       } else {
-        relative = 'Today';
+        relative = t("today");
       }
 
       return { main, relative };
@@ -216,7 +220,9 @@ const ProfileMain: React.FC = () => {
         );
       }
 
-      return <span className="text-sm text-gray-700 break-words leading-relaxed">{value}</span>;
+      const slug = value.toLowerCase().replace(/_/g, '-');
+      const translated = t(slug);
+      return <span className="text-sm text-gray-700 break-words leading-relaxed">{translated !== slug ? translated : value}</span>;
     }
 
     return <span className="text-sm text-gray-700 break-words leading-relaxed">{String(value)}</span>;
@@ -293,7 +299,7 @@ const ProfileMain: React.FC = () => {
           }
 
           return (
-            <div key={key} className="flex flex-col px-4 py-3 bg-[#f8faf9] rounded-lg mb-3 border border-[#115740]/8 transition-all duration-200 hover:bg-[#f0f7f4] hover:border-[#115740]/15">
+            <div key={`${type}-${key}`} className="flex flex-col px-4 py-3 bg-[#f8faf9] rounded-lg mb-3 border border-[#115740]/8 transition-all duration-200 hover:bg-[#f0f7f4] hover:border-[#115740]/15">
               <span className="text-[0.7rem] font-semibold text-[#115740] uppercase tracking-wide mb-1.5">{formatLabel(key)}</span>
               {renderFieldValue(key, value)}
             </div>
@@ -383,7 +389,7 @@ const ProfileMain: React.FC = () => {
               <FaTimes />
             </button>
             <h3 className="text-white text-lg font-semibold m-0 break-words leading-snug">
-              {getTypeIcon(popupInfo.type)} {popupInfo.name}
+              {getTypeIcon(popupInfo.type)} {formatLabel(popupInfo.name)}
             </h3>
             <p className="text-white/75 text-xs mt-1 font-normal">{getTypeLabel(popupInfo.type)}</p>
           </div>
@@ -427,10 +433,14 @@ const ProfileMain: React.FC = () => {
       // You can add your delete logic here
     };
 
+    const titleKey = type.toLowerCase().replace(/_/g, '-');
+    const titleTranslated = t(titleKey, { defaultValue: '' });
+    const sectionTitle = titleTranslated || title;
+
     return (
       <div className="mb-5">
         <h3 className="text-xl text-[#006400] mt-5 mb-2.5">
-          {icon} {title}
+          {icon} {sectionTitle}
         </h3>
         {Object.entries(items).length > 0 ? (
           <ul className="list-none p-0">
@@ -440,7 +450,14 @@ const ProfileMain: React.FC = () => {
                   onClick={() => handleItemClick(type, key, value)}
                   className="flex-1 min-w-0 break-words overflow-wrap-anywhere hyphens-auto"
                 >
-                  {value.layer_name || value.catalog_name || value.name || key}
+                  {(() => {
+                    const rawName = value.layer_name || value.catalog_name || value.name || key;
+                    if (typeof rawName === 'string') {
+                      const translated = formatLabel(rawName);
+                      return translated;
+                    }
+                    return rawName;
+                  })()}
                 </span>
                 {/* Conditionally render the delete icon */}
                 {type.includes("layer") || type.includes("catalog") ? (
@@ -456,7 +473,7 @@ const ProfileMain: React.FC = () => {
             ))}
           </ul>
         ) : (
-          <p>{t("no")}{' '}{title.toLowerCase()}{' '}{t("available")}</p>
+          <p>{t("no-item-available", { item: sectionTitle })}</p>
         )}
       </div>
     );
