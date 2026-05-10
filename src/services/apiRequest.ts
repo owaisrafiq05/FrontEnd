@@ -454,7 +454,27 @@ const apiRequest = async ({
     if (axiosErr?.response) {
       const status = axiosErr.response.status;
       const data = axiosErr.response.data;
-      const message = getErrorMessageFromPayload(data) || t("request-failed");
+      const rawMessage = getErrorMessageFromPayload(data);
+
+      let message = rawMessage || t("request-failed");
+
+      if (rawMessage && rawMessage.includes('|')) {
+        const [key, ...params] = rawMessage.split('|');
+        // Try translating with parameters, common ones like 'item', 'name', 'count'
+        message = t(key.toLowerCase().replace(/_/g, '-'), {
+          item: params[0],
+          name: params[0],
+          count: params[0],
+          defaultValue: rawMessage,
+        });
+      } else if (rawMessage) {
+        // Try to translate the whole message by converting it to a key
+        // e.g. "Catalog not found" -> "catalog-not-found"
+        const key = rawMessage.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+        const translated = t(key, { defaultValue: rawMessage });
+        message = translated;
+      }
+
       throw new Error(`${message} (Status: ${status})`);
     }
 
