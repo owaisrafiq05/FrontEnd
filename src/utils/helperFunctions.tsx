@@ -1,5 +1,15 @@
 import { t } from '../i18n';
 
+export function translateWithBackendCategoryFallback(key: string): string {
+  const translated = t(key);
+  if (translated !== key) return translated;
+
+  const backendCategoryTranslated = t(`backend.categories.${key}`);
+  if (backendCategoryTranslated !== `backend.categories.${key}`) return backendCategoryTranslated;
+
+  return key;
+}
+
 export function formatSubcategoryName(name: string | undefined | null): string {
   if (!name) return '';
   if (name.includes('_')) {
@@ -7,7 +17,7 @@ export function formatSubcategoryName(name: string | undefined | null): string {
     if (backendCategoryTranslated !== `backend.categories.${name}`) return backendCategoryTranslated;
   }
 
-  const translated = t(name);
+  const translated = translateWithBackendCategoryFallback(name);
   if (translated !== name) return translated;
 
   return name
