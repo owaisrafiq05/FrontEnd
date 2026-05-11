@@ -11,7 +11,10 @@ import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import InlinePaymentMethod from '../CustomReportForm/components/InlinePaymentMethod';
 import PhoneVerificationStep from '../CustomReportForm/components/PhoneVerificationStep';
-import { formatSubcategoryName } from '../../utils/helperFunctions';
+import {
+  formatSubcategoryName,
+  translateWithBackendCategoryFallback,
+} from '../../utils/helperFunctions';
 import { t } from '../../i18n';
 import metaDataInformation from '../../data/metaDataInformation.json';
 
@@ -48,7 +51,10 @@ function resolveIntelligenceMeta(item: IntelligencePurchaseItem): {
       item.data_variables ??
       (meta
         ? Object.fromEntries(
-            Object.entries(meta.data_variables_description_keys).map(([k, tk]) => [k, t(tk)])
+            Object.entries(meta.data_variables_description_keys).map(([k, tk]) => [
+              k,
+              translateWithBackendCategoryFallback(tk),
+            ])
           )
         : {}),
   };
