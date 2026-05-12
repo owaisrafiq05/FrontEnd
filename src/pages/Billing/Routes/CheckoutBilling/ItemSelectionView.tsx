@@ -101,8 +101,6 @@ function ItemSelectionView({
           <p className="mt-2 text-sm text-gray-600 italic">
             {selectedItem.explanation.startsWith("New purchase of") 
               ? t("new-purchase-of", { item: selectedItem.name })
-              : selectedItem.explanation.startsWith("Dataset '") && selectedItem.explanation.endsWith("' purchased")
-              ? t("dataset-purchased", { item: selectedItem.name })
               : selectedItem.explanation}
           </p>
         )}

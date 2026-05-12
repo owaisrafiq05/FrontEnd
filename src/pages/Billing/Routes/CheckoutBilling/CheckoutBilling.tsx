@@ -1,5 +1,9 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
-import { formatSubcategoryName, fuzzyMatchCategoryType } from '../../../../utils/helperFunctions';
+import {
+  formatSubcategoryName,
+  fuzzyMatchCategoryType,
+  translateWithBackendCategoryFallback,
+} from '../../../../utils/helperFunctions';
 import urls from '../../../../urls.json';
 import { useAuth } from '../../../../context/AuthContext';
 import apiRequest from '../../../../services/apiRequest';
@@ -899,7 +903,7 @@ function CheckoutBilling({ Name }: { Name: string }) {
             description: t(meta.description_key),
             dataVariables: Object.entries(meta.data_variables_description_keys).map(([k, tk]) => ({
               key: k,
-              description: t(tk),
+              description: translateWithBackendCategoryFallback(tk),
             })),
           };
         }
@@ -913,7 +917,7 @@ function CheckoutBilling({ Name }: { Name: string }) {
             description: t(meta.description_key),
             dataVariables: Object.entries(meta.data_variables_description_keys).map(([k, tk]) => ({
               key: k,
-              description: t(tk),
+              description: translateWithBackendCategoryFallback(tk),
             })),
           };
         }
@@ -1084,8 +1088,11 @@ function CheckoutBilling({ Name }: { Name: string }) {
     if (!businessTypeSearchTerm.trim()) {
       return allBusinessTypes;
     }
+    const normalizedSearch = businessTypeSearchTerm.toLowerCase().trim();
     return allBusinessTypes.filter(type =>
-      formatCategoryName(type).toLowerCase().includes(businessTypeSearchTerm.toLowerCase())
+      [type, formatCategoryName(type), formatSubcategoryName(type)]
+        .map(value => value.toLowerCase())
+        .some(value => value.includes(normalizedSearch))
     );
   }, [allBusinessTypes, businessTypeSearchTerm, formatCategoryName]);
 
@@ -1513,7 +1520,7 @@ function CheckoutBilling({ Name }: { Name: string }) {
                               : 'text-gray-700'
                           }`}
                         >
-                          {formatCategoryName(businessType)}
+                          {formatSubcategoryName(businessType)}
                         </button>
                       ))
                     ) : (
@@ -1525,7 +1532,7 @@ function CheckoutBilling({ Name }: { Name: string }) {
 
                 {/* Display selected value */}
                 {checkout.report_potential_business_type && !isBusinessTypeDropdownOpen && (
-                  <div className="mt-2 text-sm text-gray-600">{t("selected")}{' '}<span className="font-medium text-[#115740]">{formatCategoryName(checkout.report_potential_business_type)}</span>
+                  <div className="mt-2 text-sm text-gray-600">{t("selected")}{' '}<span className="font-medium text-[#115740]">{formatSubcategoryName(checkout.report_potential_business_type)}</span>
                   </div>
                 )}
               </div>

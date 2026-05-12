@@ -89,6 +89,23 @@ const SetAttributeStep = ({
     return { valid: true };
   };
 
+
+  const getSearchableCategoryStrings = (category: string): string[] => {
+    const localized = formatSubcategoryName(category);
+    return [category, localized];
+  };
+
+  const findMatchingPredefinedCategory = (value: string): string | undefined => {
+    const normalizedValue = value.trim().toLowerCase()
+    if (!normalizedValue) return undefined;
+
+    return categories.find(category =>
+      getSearchableCategoryStrings(category).some(candidate =>
+        candidate.toLowerCase() === normalizedValue
+      )
+    );
+  };
+
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     searchValue: string,
@@ -125,9 +142,7 @@ const SetAttributeStep = ({
       return;
     }
 
-    const matchedCategory = categories.find(
-      (cat) => cat.toLowerCase() === sanitized.toLowerCase(),
-    );
+    const matchedCategory = findMatchingPredefinedCategory(sanitized);
 
     let newItem: CategoryItem;
 
@@ -175,8 +190,11 @@ const SetAttributeStep = ({
     categories: string[],
     selected: CategoryItem[],
   ): CategoryItem[] => {
+    const normalizedQuery = query.toLowerCase();
     const filtered = categories.filter((cat) =>
-      cat.toLowerCase().includes(query.toLowerCase()),
+      getSearchableCategoryStrings(cat).some(searchable =>
+        searchable.toLowerCase().includes(normalizedQuery)
+      ),
     );
 
     const predefinedItems: CategoryItem[] = filtered.map((cat) => ({
@@ -195,7 +213,7 @@ const SetAttributeStep = ({
     );
 
     const customKeywords = selected.filter((item) => item.type === "custom");
-    return  [...customKeywords, ...selectedPredefined, ...unselectedPredefined];
+    return [...customKeywords, ...selectedPredefined, ...unselectedPredefined];
   };
 
   const toggleSelection = (
@@ -215,87 +233,82 @@ const SetAttributeStep = ({
   };
 
   return (
-  
-        <div className="bg-white rounded-xl border-2 border-gray-200 shadow-sm p-4 flex flex-col overflow-hidden max-h-[60vh]">
-          <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center flex-shrink-0">
-            <FaHandshake className="w-4 h-4 me-2 text-primary" />{t("included-categories")}</h3>
-          <input
-            type="text"
-            placeholder={t("search-categories-or-add-custom-keyword")}
-            value={searchComplementary}
-            onChange={(e) => setSearchComplementary(e.target.value)}
-            onKeyDown={(e) =>
-              handleKeyDown(
-                e,
-                searchComplementary,
-                "complementary_categories",
-                selectedComplementary,
-                setSelectedComplementary,
-                setSearchComplementary,
-                setComplementaryError,
-              )
-            }
-            disabled={disabled}
-            className={`w-full border-2 rounded-xl px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none ${
-              disabled
-                ? "bg-gray-100 border-gray-200 cursor-not-allowed opacity-60"
-                : "border-gray-200 hover:border-gray-300"
-            }`}
-          />
 
-          {searchComplementary.trim() &&
-            !categories.some(
-              (cat) =>
-                cat.toLowerCase() === searchComplementary.trim().toLowerCase(),
-            ) && (
-              <div className="text-xs text-blue-600 mb-2 px-3">{t("press-enter-to-add")}{searchComplementary.trim().replace(/^@+|@+$/g, "")}{t("as-custom-keyword")}</div>
-            )}
+    <div className="bg-white rounded-xl border-2 border-gray-200 shadow-sm p-4 flex flex-col overflow-hidden max-h-[60vh]">
+      <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center flex-shrink-0">
+        <FaHandshake className="w-4 h-4 me-2 text-primary" />{t("included-categories")}</h3>
+      <input
+        type="text"
+        placeholder={t("search-categories-or-add-custom-keyword")}
+        value={searchComplementary}
+        onChange={(e) => setSearchComplementary(e.target.value)}
+        onKeyDown={(e) =>
+          handleKeyDown(
+            e,
+            searchComplementary,
+            "complementary_categories",
+            selectedComplementary,
+            setSelectedComplementary,
+            setSearchComplementary,
+            setComplementaryError,
+          )
+        }
+        disabled={disabled}
+        className={`w-full border-2 rounded-xl px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none ${disabled
+            ? "bg-gray-100 border-gray-200 cursor-not-allowed opacity-60"
+            : "border-gray-200 hover:border-gray-300"
+          }`}
+      />
 
-          {complementaryError && (
-            <div className="text-xs text-red-600 mb-2 px-3 flex items-center">
-              <FaExclamationTriangle className="me-1" />
-              {complementaryError}
-            </div>
-          )}
+      {searchComplementary.trim() &&
+        !findMatchingPredefinedCategory(searchComplementary.trim()) && (
+          <div className="text-xs text-blue-600 mb-2 px-3">{t("press-enter-to-add")}{searchComplementary.trim().replace(/^@+|@+$/g, "")}{t("as-custom-keyword")}</div>
+        )}
 
-          <div className="flex flex-wrap gap-1 max-h-52 overflow-y-auto pe-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {getOrderedCategories(
-              searchComplementary,
-              inputCategories,
-              selectedComplementary,
-            ).map((item: CategoryItem) => {
-              const isSelected = selectedComplementary.some(
-                (s) => s.value === item.value,
-              );
-
-              return (
-                <span
-                  key={item.value}
-                  onClick={() =>
-                    !disabled &&
-                    toggleSelection(
-                      "complementary_categories",
-                      item,
-                      setSelectedComplementary,
-                      selectedComplementary,
-                    )
-                  }
-                  className={`px-2.5 py-1 text-sm rounded-full cursor-pointer border-2 transition-all ${
-                    item.type === "custom"
-                      ? isSelected
-                        ? "bg-purple-600 text-white border-purple-600"
-                        : "bg-purple-50 text-purple-700 border-purple-200 hover:border-purple-400"
-                      : isSelected
-                        ? "bg-primary text-white border-primary"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary hover:text-primary"
-                  } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
-                >
-                  {item.type === "predefined" ? formatSubcategoryName(item.value) : item.value}
-                </span>
-              );
-            })}
-          </div>
+      {complementaryError && (
+        <div className="text-xs text-red-600 mb-2 px-3 flex items-center">
+          <FaExclamationTriangle className="me-1" />
+          {complementaryError}
         </div>
+      )}
+
+      <div className="flex flex-wrap gap-1 max-h-52 overflow-y-auto pe-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        {getOrderedCategories(
+          searchComplementary,
+          inputCategories,
+          selectedComplementary,
+        ).map((item: CategoryItem) => {
+          const isSelected = selectedComplementary.some(
+            (s) => s.value === item.value,
+          );
+
+          return (
+            <span
+              key={item.value}
+              onClick={() =>
+                !disabled &&
+                toggleSelection(
+                  "complementary_categories",
+                  item,
+                  setSelectedComplementary,
+                  selectedComplementary,
+                )
+              }
+              className={`px-2.5 py-1 text-sm rounded-full cursor-pointer border-2 transition-all ${item.type === "custom"
+                  ? isSelected
+                    ? "bg-purple-600 text-white border-purple-600"
+                    : "bg-purple-50 text-purple-700 border-purple-200 hover:border-purple-400"
+                  : isSelected
+                    ? "bg-primary text-white border-primary"
+                    : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary hover:text-primary"
+                } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+            >
+              {item.type === "predefined" ? formatSubcategoryName(item.value) : item.value}
+            </span>
+          );
+        })}
+      </div>
+    </div>
   )
 
 };

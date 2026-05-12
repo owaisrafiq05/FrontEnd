@@ -13,12 +13,17 @@ interface BasicInformationStepProps {
     country_name: string;
     city_name: string;
     Type: string;
+    num_groups: number;
+    group_size: number;
+    revenue_period_days: number;
+    manager_phone: string;
+    groups_info: Array<{ phone: string; lat: number | null; lng: number | null }>;
   };
   errors: {
     city_name?: string;
     Type?: string;
   };
-  onInputChange: (field: string, value: string) => void;
+  onInputChange: (field: string, value: string | number | unknown[]) => void;
   disabled?: boolean;
 }
 
@@ -29,6 +34,15 @@ const MotorcycleInputNumber = ({
   disabled = false,
   objKey,
   text,
+  warning,
+}: {
+  formData: BasicInformationStepProps['formData'];
+  errors: BasicInformationStepProps['errors'];
+  onInputChange: BasicInformationStepProps['onInputChange'];
+  disabled?: boolean;
+  objKey: string;
+  text: string;
+  warning?: string;
 }) => {
 	const key = objKey;
 	return (
@@ -48,15 +62,15 @@ const MotorcycleInputNumber = ({
             type="number"
             id="num_groups"
             placeholder={text}
-            value={formData[key]}
+            value={(formData as Record<string, unknown>)[key] as string | number}
             pattern="[0-9]*"
             required
             onInput={e => {
-              if(e.target.checkValidity() || e.target.value === "") {
-              
-	              onInputChange(key, e.target.value === "" ? "" : Number(e.target.value))
+              const input = e.target as HTMLInputElement;
+              if(input.checkValidity() || input.value === "") {
+	              onInputChange(key, input.value === "" ? "" : Number(input.value))
 	            } else
-	              e.target.value = formData[key]
+	              input.value = String((formData as Record<string, unknown>)[key])
             }}
             className={`w-full pl-2 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 ${
               disabled
@@ -68,6 +82,12 @@ const MotorcycleInputNumber = ({
           />
         </div>
       </div>
+      {warning && (
+        <p className="text-xs text-amber-600 flex items-center gap-1">
+          <FaExclamationTriangle className="w-3 h-3 flex-shrink-0" />
+          {warning}
+        </p>
+      )}
     </div>
   )
 }
@@ -84,7 +104,7 @@ const BasicInformationStep = (obj: BasicInformationStepProps) => {
     <div className="space-y-3 animate-fade-in-up">
       <div className="text-center mb-3">
         <h3 className="text-lg font-bold text-gray-900 mb-1">{t("basic-information")}</h3>
-        <p className="text-sm text-gray-600">{t("let-s-start-with-the-basic-details-for-your-expansion-report")}</p>
+        <p className="text-sm text-gray-600">{t("let-s-start-with-the-basic-details-for-your-route-plan")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -143,11 +163,18 @@ const BasicInformationStep = (obj: BasicInformationStepProps) => {
       </div>
       <div className="flex flex-col lg:flex-row gap-2">	      
 	      <MotorcycleInputNumber {...Object.assign({
-		      text: t("how-many-groups"),
+		      text: t("how-many-vans"),
 		      objKey: "num_groups",
+		      warning: formData.num_groups > 1 ? t("currently-limited-to-1-van") : undefined,
 		    },obj)} />
 	      <MotorcycleInputNumber {...Object.assign({
-		      text: t("how-big-are-the-groups"),
+		      text: t("revisit-frequency-days"),
+		      objKey: "revenue_period_days",
+		    },obj)} />
+      </div>
+      <div className="flex flex-col lg:flex-row gap-2">
+	      <MotorcycleInputNumber {...Object.assign({
+		      text: t("how-many-stores-in-x-days", { days: formData.revenue_period_days ?? 14 }),
 		      objKey: "group_size",
 		    },obj)} />
       </div>

@@ -105,6 +105,22 @@ const SetAttributeStep = ({
     return { valid: true };
   };
 
+  const getSearchableCategoryStrings = (category: string): string[] => {
+    const localized = formatSubcategoryName(category);
+    return [category, localized];
+  };
+
+  const findMatchingPredefinedCategory = (value: string): string | undefined => {
+    const normalizedValue = value.trim().toLowerCase();
+    if (!normalizedValue) return undefined;
+
+    return categories.find(category =>
+      getSearchableCategoryStrings(category).some(candidate =>
+        candidate.toLowerCase() === normalizedValue
+      )
+    );
+  };
+
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     searchValue: string,
@@ -141,9 +157,7 @@ const SetAttributeStep = ({
       return;
     }
 
-    const matchedCategory = categories.find(
-      (cat) => cat.toLowerCase() === sanitized.toLowerCase(),
-    );
+    const matchedCategory = findMatchingPredefinedCategory(sanitized);
 
     let newItem: CategoryItem;
 
@@ -207,8 +221,11 @@ const SetAttributeStep = ({
     categories: string[],
     selected: CategoryItem[],
   ): CategoryItem[] => {
+    const normalizedQuery = query.toLowerCase();
     const filtered = categories.filter((cat) =>
-      cat.toLowerCase().includes(query.toLowerCase()),
+      getSearchableCategoryStrings(cat).some(searchable =>
+        searchable.toLowerCase().includes(normalizedQuery)
+      ),
     );
 
     const predefinedItems: CategoryItem[] = filtered.map((cat) => ({
@@ -346,10 +363,7 @@ const SetAttributeStep = ({
           />
 
           {searchComplementary.trim() &&
-            !categories.some(
-              (cat) =>
-                cat.toLowerCase() === searchComplementary.trim().toLowerCase(),
-            ) && (
+            !findMatchingPredefinedCategory(searchComplementary.trim()) && (
               <div className="text-xs text-blue-600 mb-2 px-3">{t("press-enter-to-add")}{searchComplementary.trim().replace(/^@+|@+$/g, "")}{t("as-custom-keyword")}</div>
             )}
 
@@ -429,10 +443,7 @@ const SetAttributeStep = ({
           />
 
           {searchCompetition.trim() &&
-            !categories.some(
-              (cat) =>
-                cat.toLowerCase() === searchCompetition.trim().toLowerCase(),
-            ) && (
+            !findMatchingPredefinedCategory(searchCompetition.trim()) && (
               <div className="text-xs text-blue-600 mb-2 px-3">{t("press-enter-to-add")}{searchCompetition.trim().replace(/^@+|@+$/g, "")}{t("as-custom-keyword")}</div>
             )}
 
@@ -512,9 +523,7 @@ const SetAttributeStep = ({
           />
 
           {searchCross.trim() &&
-            !categories.some(
-              (cat) => cat.toLowerCase() === searchCross.trim().toLowerCase(),
-            ) && (
+            !findMatchingPredefinedCategory(searchCross.trim()) && (
               <div className="text-xs text-blue-600 mb-2 px-3">{t("press-enter-to-add")}{searchCross.trim().replace(/^@+|@+$/g, "")}{t("as-custom-keyword")}</div>
             )}
 
