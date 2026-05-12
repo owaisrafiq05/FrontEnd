@@ -8,7 +8,6 @@
     "build": "vite build",
     "lint": "eslint .",
     "lint:files": "node scripts/eslint-files.mjs",
-    "i18n:migrate-backend-categories": "node scripts/migrate-backend-categories.mjs --write",
     "preview": "vite preview --port 3000",
     "format": "prettier --config .prettierrc.cjs --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "format:check": "prettier --config .prettierrc.cjs --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
