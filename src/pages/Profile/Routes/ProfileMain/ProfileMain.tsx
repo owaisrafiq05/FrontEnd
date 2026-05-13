@@ -299,7 +299,7 @@ const ProfileMain: React.FC = () => {
           }
 
           return (
-            <div key={`${type}-${key}`} className="flex flex-col px-4 py-3 bg-[#f8faf9] rounded-lg mb-3 border border-[#115740]/8 transition-all duration-200 hover:bg-[#f0f7f4] hover:border-[#115740]/15">
+            <div key={key} className="flex flex-col px-4 py-3 bg-[#f8faf9] rounded-lg mb-3 border border-[#115740]/8 transition-all duration-200 hover:bg-[#f0f7f4] hover:border-[#115740]/15">
               <span className="text-[0.7rem] font-semibold text-[#115740] uppercase tracking-wide mb-1.5">{formatLabel(key)}</span>
               {renderFieldValue(key, value)}
             </div>
